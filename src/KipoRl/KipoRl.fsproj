@@ -12,6 +12,8 @@
     <Compile Include="World.fs" />
     <Compile Include="Messages.fs" />
     <Compile Include="InputSystem.fs" />
+    <Compile Include="PlayerMovementSystem.fs" />
+    <Compile Include="MovementSystem.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

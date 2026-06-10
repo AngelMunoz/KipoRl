@@ -3,6 +3,7 @@ module KipoRl.Tests.InputSystemTests
 open Expecto
 open KipoRl
 open Mibo.Input
+open FSharp.UMX
 
 let tests =
   testList "InputSystem" [
@@ -15,9 +16,9 @@ let tests =
             Started = Set [ MoveForward ]
       }
 
-      InputSystem.update 0 states world
+      InputSystem.update (UMX.tag 0L) states world
 
-      let stored = world.Input.ActionStates[0]
+      let stored = world.Input.ActionStates[UMX.tag 0L]
       Expect.isTrue (stored.Held.Contains MoveLeft) "MoveLeft should be held"
 
       Expect.isTrue
@@ -46,19 +47,19 @@ let tests =
             Held = Set [ MoveRight ]
       }
 
-      InputSystem.update 0 playerState world
-      InputSystem.update 1 enemyState world
+      InputSystem.update (UMX.tag 0L) playerState world
+      InputSystem.update (UMX.tag 1L) enemyState world
 
       Expect.isTrue
-        (world.Input.ActionStates[0].Held.Contains MoveLeft)
+        (world.Input.ActionStates[UMX.tag 0L].Held.Contains MoveLeft)
         "Player should have MoveLeft"
 
       Expect.isTrue
-        (world.Input.ActionStates[1].Held.Contains MoveRight)
+        (world.Input.ActionStates[UMX.tag 1L].Held.Contains MoveRight)
         "Enemy should have MoveRight"
 
       Expect.isFalse
-        (world.Input.ActionStates[0].Held.Contains MoveRight)
+        (world.Input.ActionStates[UMX.tag 0L].Held.Contains MoveRight)
         "Player should not have MoveRight"
     }
 
@@ -75,10 +76,10 @@ let tests =
             Held = Set [ MoveRight ]
       }
 
-      InputSystem.update 0 frame1 world
-      InputSystem.update 0 frame2 world
+      InputSystem.update (UMX.tag 0L) frame1 world
+      InputSystem.update (UMX.tag 0L) frame2 world
 
-      let stored = world.Input.ActionStates[0]
+      let stored = world.Input.ActionStates[UMX.tag 0L]
 
       Expect.isFalse
         (stored.Held.Contains MoveLeft)

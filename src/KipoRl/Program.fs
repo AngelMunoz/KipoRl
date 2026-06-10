@@ -3,9 +3,11 @@ module KipoRl.Program
 open System
 open System.Numerics
 open Raylib_cs
+open FSharp.UMX
 open Mibo.Elmish
 open Mibo.Elmish.Graphics3D
 open Mibo.Elmish.Graphics3D.Pipelines
+open Mibo.Elmish.System
 open Mibo.Input
 
 // ─────────────────────────────────────────────────────────────
@@ -31,6 +33,9 @@ let inputMap =
 
 let init(_ctx: GameContext) : struct (World * Cmd<TopLevelMsg>) =
   let world = World()
+  let defaultPlayer = UMX.tag 0L
+  world.Players.Add defaultPlayer |> ignore
+  world.Entities.Positions[defaultPlayer] <- Vector3.Zero
   struct (world, Cmd.none)
 
 // ─────────────────────────────────────────────────────────────
@@ -42,9 +47,17 @@ let update
   (world: World)
   : struct (World * Cmd<TopLevelMsg>) =
   match msg with
-  | Tick _gt -> world, Cmd.none
-
-  | FixedStep _dt -> world, Cmd.none
+  | Tick gt -> world, Cmd.none
+  | FixedStep dt ->
+    world
+    |> System.start
+    |> System.pipeMutable(fun w ->
+      PlayerMovementSystem.update w
+      struct (w, Cmd.none))
+    |> System.pipeMutable(fun w ->
+      MovementSystem.update dt w
+      struct (w, Cmd.none))
+    |> System.finish id
 
   | Input inputMsg ->
     match inputMsg with
@@ -66,9 +79,6 @@ let view (_ctx: GameContext) (world: World) (buffer: RenderBuffer3D) =
       CameraProjection.Perspective
     )
 
-  let transform = Raymath.MatrixTranslate(0.f, 0.f, 0.f)
-  let material = Material3D.colored Color.Red
-
   buffer
   |> Draw3D.beginCameraWith(
     Camera3D.render camera |> Camera3D.withClear Color.RayWhite
@@ -83,15 +93,21 @@ let view (_ctx: GameContext) (world: World) (buffer: RenderBuffer3D) =
     Intensity = 1.f
     CastsShadows = false
   }
-  |> Draw3D.drawMesh Primitive3D.cube transform material
-  |> Draw3D.endCamera
   |> Draw3D.drop
+
+  for KeyValue(_, position) in world.Entities.Positions do
+    let transform = Raymath.MatrixTranslate(position.X, position.Y, position.Z)
+    let material = Material3D.colored Color.Red
+
+    buffer |> Draw3D.drawMesh Primitive3D.cube transform material |> Draw3D.drop
+
+  buffer |> Draw3D.endCamera |> Draw3D.drop
 
 // ─────────────────────────────────────────────────────────────
 // Program
 // ─────────────────────────────────────────────────────────────
 
-let playerId = 0
+let playerId = UMX.tag<EntityId> 0L
 
 [<EntryPoint>]
 let main _ =
@@ -111,6 +127,12 @@ let main _ =
         (fun states -> Input(ActionStatesChanged(playerId, states)))
         ctx)
     |> Program.withTick Tick
+    |> Program.withFixedStep {
+      StepSeconds = (1.f / 60.f)
+      MaxStepsPerFrame = 5
+      MaxFrameSeconds = ValueNone
+      Map = FixedStep
+    }
     |> Program.withRenderer(fun () ->
       Renderer3D.create (ForwardPbrPipeline()) view)
 

@@ -5,7 +5,9 @@ open Mibo.Input
 
 [<Struct>]
 type InputMsg =
-  | ActionStatesChanged of entityId: int * states: ActionState<GameAction>
+  | ActionStatesChanged of
+    entityId: int64<EntityId> *
+    states: ActionState<GameAction>
 
 [<Struct>]
 type TopLevelMsg =
