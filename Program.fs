@@ -8,19 +8,6 @@ open Mibo.Elmish.Graphics3D
 open Mibo.Elmish.Graphics3D.Pipelines
 open Mibo.Input
 
-// ─────────────────────────────────────────────────────────────
-// Input
-// ─────────────────────────────────────────────────────────────
-
-[<Struct>]
-type GameAction =
-  | MoveForward
-  | MoveBackward
-  | MoveLeft
-  | MoveRight
-  | MoveUp
-  | MoveDown
-
 let inputMap =
   InputMap.empty
   |> InputMap.key MoveForward KeyboardKey.W

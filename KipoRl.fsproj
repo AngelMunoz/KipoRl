@@ -9,6 +9,7 @@
     <Compile Include="src/Types.fs" />
     <Compile Include="src/Dictionary.fs" />
     <Compile Include="src/ResizeArray.fs" />
+    <Compile Include="src/World.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
