@@ -10,9 +10,11 @@ let tests =
   testList "Movement" [
     test "PlayerMovementSystem sets velocity from input" {
       let world = World()
-      world.Entities.Positions[UMX.tag 0L] <- Vector3.Zero
+      let entityId = UMX.tag 0L
+      world.Players.Add entityId |> ignore
+      world.Entities.Positions[entityId] <- Vector3.Zero
 
-      world.Input.ActionStates[UMX.tag 0L] <-
+      world.Input.ActionStates[entityId] <-
         {
           ActionState.empty with
               Held = Set [ MoveRight; MoveForward ]
@@ -20,7 +22,7 @@ let tests =
 
       PlayerMovementSystem.update world
 
-      let vel = world.Entities.Velocities[UMX.tag 0L]
+      let vel = world.Entities.Velocities[entityId]
 
       Expect.floatClose
         Accuracy.medium
@@ -37,12 +39,13 @@ let tests =
 
     test "MovementSystem applies velocity to position" {
       let world = World()
-      world.Entities.Positions[UMX.tag 0L] <- Vector3(1.f, 0.f, 1.f)
-      world.Entities.Velocities[UMX.tag 0L] <- Vector3(2.f, 0.f, 2.f)
+      let entityId = UMX.tag 0L
+      world.Entities.Positions[entityId] <- Vector3(1.f, 0.f, 1.f)
+      world.Entities.Velocities[entityId] <- Vector3(2.f, 0.f, 2.f)
 
       MovementSystem.update 0.5f world
 
-      let pos = world.Entities.Positions[UMX.tag 0L]
+      let pos = world.Entities.Positions[entityId]
 
       Expect.floatClose
         Accuracy.medium
