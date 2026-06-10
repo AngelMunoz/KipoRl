@@ -6,7 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="src/Types.fs" />
+    <Compile Include="src/Dictionary.fs" />
+    <Compile Include="src/ResizeArray.fs" />
     <Compile Include="src/Messages.fs" />
+    <Compile Include="src/System.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
