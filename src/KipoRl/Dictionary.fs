@@ -1,4 +1,4 @@
-module Dictionary
+module KipoRl.Dictionary
 
 open System
 open System.Collections.Generic

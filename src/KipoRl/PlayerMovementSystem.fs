@@ -3,9 +3,10 @@ namespace KipoRl
 open System.Numerics
 
 module PlayerMovementSystem =
+  open Mibo.Elmish
   let moveSpeed = 5.f
 
-  let update(world: World) =
+  let update(world: World) : struct (World * Cmd<_>) =
     for KeyValue(entityId, states) in world.Input.ActionStates do
       if not(world.Players.Contains entityId) then
         ()
@@ -27,3 +28,5 @@ module PlayerMovementSystem =
         else 0.f
 
       world.Entities.Velocities[entityId] <- Vector3(dx, dy, dz)
+
+    world, Cmd.none

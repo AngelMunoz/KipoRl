@@ -7,7 +7,6 @@ open FSharp.UMX
 open Mibo.Elmish
 open Mibo.Elmish.Graphics3D
 open Mibo.Elmish.Graphics3D.Pipelines
-open Mibo.Elmish.System
 open Mibo.Input
 
 // ─────────────────────────────────────────────────────────────
@@ -51,12 +50,8 @@ let update
   | FixedStep dt ->
     world
     |> System.start
-    |> System.pipeMutable(fun w ->
-      PlayerMovementSystem.update w
-      struct (w, Cmd.none))
-    |> System.pipeMutable(fun w ->
-      MovementSystem.update dt w
-      struct (w, Cmd.none))
+    |> System.pipeMutable PlayerMovementSystem.update
+    |> System.pipeMutable(MovementSystem.update dt)
     |> System.finish id
 
   | Input inputMsg ->
