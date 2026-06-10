@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/KipoRl.Tests/KipoRl.Tests.fsproj" />
     <Project Path="src/KipoRl/KipoRl.fsproj" />
   </Folder>
 </Solution>
