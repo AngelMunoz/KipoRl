@@ -41,7 +41,7 @@ module WorldPosition =
     let dx = a.X - b.X
     let dy = a.Y - b.Y
     let dz = a.Z - b.Z
-    sqrt (dx * dx + dy * dy + dz * dz)
+    sqrt(dx * dx + dy * dy + dz * dz)
 
 [<Struct>]
 type Element =

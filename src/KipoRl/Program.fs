@@ -7,6 +7,20 @@ open Mibo.Elmish
 open Mibo.Elmish.Graphics3D
 open Mibo.Elmish.Graphics3D.Pipelines
 open Mibo.Input
+open Mibo.Elmish.System
+
+// ─────────────────────────────────────────────────────────────
+// Input
+// ─────────────────────────────────────────────────────────────
+
+[<Struct>]
+type GameAction =
+  | MoveForward
+  | MoveBackward
+  | MoveLeft
+  | MoveRight
+  | MoveUp
+  | MoveDown
 
 let inputMap =
   InputMap.empty
