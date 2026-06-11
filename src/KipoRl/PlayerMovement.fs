@@ -4,6 +4,7 @@ open System.Numerics
 
 module PlayerMovementSystem =
   open Mibo.Elmish
+  // TODO: Replace with DerivedStatsCache MS when combat system lands
   let moveSpeed = 5.f
 
   let update(world: World) : struct (World * Cmd<_>) =

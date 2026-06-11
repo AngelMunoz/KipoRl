@@ -4,9 +4,10 @@ open Expecto
 
 let allTests =
   testList "All" [
-    WorldTests.tests
     InputSystemTests.tests
     MovementTests.tests
+    UnitMovementTests.tests
+    UnitMovementE2ETests.tests
   ]
 
 [<EntryPoint>]

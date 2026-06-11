@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="InputSystemTests.fs" />
     <Compile Include="MovementTests.fs" />
+    <Compile Include="UnitMovementTests.fs" />
+    <Compile Include="UnitMovementE2ETests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

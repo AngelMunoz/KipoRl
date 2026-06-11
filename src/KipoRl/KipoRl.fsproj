@@ -13,6 +13,7 @@
     <Compile Include="Input.fs" />
     <Compile Include="PlayerMovement.fs" />
     <Compile Include="EntityMovement.fs" />
+    <Compile Include="UnitMovement.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

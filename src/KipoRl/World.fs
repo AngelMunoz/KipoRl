@@ -25,7 +25,15 @@ type EntityState() =
   member val Velocities: Dictionary<int64<EntityId>, Vector3> =
     Dictionary() with get, set
 
+type MovementState() =
+  member val States: Dictionary<int64<EntityId>, MovementStateKind> =
+    Dictionary() with get, set
+
+  member val Targets: Dictionary<int64<EntityId>, WorldPosition> =
+    Dictionary() with get, set
+
 type World() =
   member val Input: InputState = InputState() with get, set
   member val Entities: EntityState = EntityState() with get, set
+  member val Movement: MovementState = MovementState() with get, set
   member val Players: HashSet<int64<EntityId>> = HashSet() with get, set

@@ -52,6 +52,7 @@ let update
     |> System.start
     |> System.pipeMutable PlayerMovementSystem.update
     |> System.pipeMutable(MovementSystem.update dt)
+    |> System.pipeMutable(UnitMovementSystem.update dt)
     |> System.finish id
 
   | Input inputMsg ->
@@ -59,6 +60,10 @@ let update
     | ActionStatesChanged(entityId, states) ->
       InputSystem.update entityId states world
       world, Cmd.none
+
+  | Movement movementMsg ->
+    MovementSystem.handleMsg world movementMsg
+    world, Cmd.none
 
 // ─────────────────────────────────────────────────────────────
 // View
