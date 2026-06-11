@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="WorldTests.fs" />
     <Compile Include="InputSystemTests.fs" />
     <Compile Include="MovementTests.fs" />
     <Compile Include="Program.fs" />

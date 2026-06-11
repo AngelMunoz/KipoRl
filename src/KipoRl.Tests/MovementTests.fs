@@ -20,7 +20,7 @@ let tests =
               Held = Set [ MoveRight; MoveForward ]
         }
 
-      PlayerMovementSystem.update world
+      let struct (world, _) = PlayerMovementSystem.update world
 
       let vel = world.Entities.Velocities[entityId]
 
@@ -43,7 +43,7 @@ let tests =
       world.Entities.Positions[entityId] <- Vector3(1.f, 0.f, 1.f)
       world.Entities.Velocities[entityId] <- Vector3(2.f, 0.f, 2.f)
 
-      MovementSystem.update 0.5f world
+      let struct (world, _) = MovementSystem.update 0.5f world
 
       let pos = world.Entities.Positions[entityId]
 
