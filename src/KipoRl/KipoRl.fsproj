@@ -14,6 +14,7 @@
     <Compile Include="PlayerMovement.fs" />
     <Compile Include="EntityMovement.fs" />
     <Compile Include="UnitMovement.fs" />
+    <Compile Include="ResourceManager.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

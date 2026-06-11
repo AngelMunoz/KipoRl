@@ -58,10 +58,17 @@ type CombatState() =
   member val InCombatUntil: Dictionary<int64<EntityId>, TimeSpan> =
     Dictionary() with get, set
 
-  member val RegenAccumulators: Dictionary<int64<EntityId>, struct (float32 * float32)> =
-    Dictionary() with get, set
+  member val RegenAccumulators: Dictionary<
+    int64<EntityId>,
+    struct (float32 * float32)
+   > = Dictionary() with get, set
+
+type TimeState() =
+  member val TotalGameTime: TimeSpan = TimeSpan.Zero with get, set
+  member val Delta: TimeSpan = TimeSpan.Zero with get, set
 
 type World() =
+  member val Time: TimeState = TimeState() with get, set
   member val Input: InputState = InputState() with get, set
   member val Entities: EntityState = EntityState() with get, set
   member val Movement: MovementState = MovementState() with get, set

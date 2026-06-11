@@ -66,6 +66,7 @@ let update
     |> System.pipeMutable PlayerMovementSystem.update
     |> System.pipeMutable(MovementSystem.update dt)
     |> System.pipeMutable(UnitMovementSystem.update dt)
+    |> System.pipeMutable(ResourceManagerSystem.update dt)
     |> System.finish id
 
   | Input inputMsg ->
@@ -90,6 +91,23 @@ let update
   | Movement movementMsg ->
     MovementSystem.handleMsg world movementMsg
     world, Cmd.none
+
+  | ResourceManager resourceMsg ->
+    ResourceManagerSystem.handleMsg world resourceMsg
+
+  | Combat combatMsg ->
+    match combatMsg with
+    | CombatMsg.EffectResource(resTarget, resource, amount) ->
+      ResourceManagerSystem.handleMsg
+        world
+        (RestoreResource(resTarget, resource, amount))
+    | CombatMsg.AbilityIntent _ -> world, Cmd.none
+    | CombatMsg.DamageDealt _ -> world, Cmd.none
+    | CombatMsg.EffectApplied _ -> world, Cmd.none
+    | CombatMsg.EffectDamage _ -> world, Cmd.none
+    | CombatMsg.EntityDied _ -> world, Cmd.none
+
+  | Notification _ -> world, Cmd.none
 
 // ─────────────────────────────────────────────────────────────
 // View

@@ -8,6 +8,8 @@ let allTests =
     MovementTests.tests
     UnitMovementTests.tests
     UnitMovementE2ETests.tests
+    ResourceManagerTests.tests
+    ResourceManagerE2ETests.tests
   ]
 
 [<EntryPoint>]
