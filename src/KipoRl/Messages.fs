@@ -33,6 +33,11 @@ type ResourceManagerMsg =
     amount: int
 
 [<Struct>]
+type EffectProcessingMsg =
+  | ApplyEffect of target: int64<EntityId> * effect: ActiveEffect
+  | RemoveEffect of target: int64<EntityId> * effectIndex: int
+
+[<Struct>]
 type CombatMsg =
   | AbilityIntent of
     caster: int64<EntityId> *
@@ -57,5 +62,6 @@ type TopLevelMsg =
   | Input of inputMsg: InputMsg
   | Movement of movementMsg: MovementMsg
   | ResourceManager of resourceManagerMsg: ResourceManagerMsg
+  | EffectProcessing of effectProcessingMsg: EffectProcessingMsg
   | Combat of combatMsg: CombatMsg
   | Notification of notificationMsg: NotificationMsg

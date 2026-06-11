@@ -10,6 +10,7 @@ let allTests =
     UnitMovementE2ETests.tests
     ResourceManagerTests.tests
     ResourceManagerE2ETests.tests
+    EffectProcessingE2ETests.tests
   ]
 
 [<EntryPoint>]

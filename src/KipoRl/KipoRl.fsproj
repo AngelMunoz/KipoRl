@@ -15,6 +15,7 @@
     <Compile Include="EntityMovement.fs" />
     <Compile Include="UnitMovement.fs" />
     <Compile Include="ResourceManager.fs" />
+    <Compile Include="EffectProcessing.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

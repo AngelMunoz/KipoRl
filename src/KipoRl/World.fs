@@ -63,6 +63,11 @@ type CombatState() =
     struct (float32 * float32)
    > = Dictionary() with get, set
 
+  member val ActiveEffects: Dictionary<
+    int64<EntityId>,
+    ResizeArray<ActiveEffect>
+   > = Dictionary() with get, set
+
 type TimeState() =
   member val TotalGameTime: TimeSpan = TimeSpan.Zero with get, set
   member val Delta: TimeSpan = TimeSpan.Zero with get, set

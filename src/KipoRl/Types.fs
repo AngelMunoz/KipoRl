@@ -23,6 +23,9 @@ type ScenarioId
 [<Measure>]
 type AiArchetypeId
 
+[<Measure>]
+type EffectId
+
 [<Struct>]
 type WorldPosition = { X: float32; Y: float32; Z: float32 }
 
@@ -199,10 +202,23 @@ type EffectKind =
   | Taunt
 
 [<Struct>]
+type Duration =
+  | Instant
+  | Timed of TimeSpan
+  | Loop of interval: TimeSpan * duration: TimeSpan
+  | PermanentLoop of interval: TimeSpan
+  | Permanent
+
+[<Struct>]
+type DamageSource =
+  | Physical
+  | Magical
+
+[<Struct>]
 type StackingRule =
   | NoStack
-  | StackDuration
-  | StackIntensity
+  | RefreshDuration
+  | AddStack of maxStacks: int
 
 [<Struct>]
 type ResourceKind =
@@ -286,13 +302,29 @@ type SpawnZone = {
 }
 
 [<Struct>]
+type EffectModifier =
+  | StaticMod of StatModifier
+  | ResourceChange of resource: ResourceKind * amount: int
+
+[<Struct>]
+type Effect = {
+  Name: string
+  Kind: EffectKind
+  DamageSource: DamageSource
+  Stacking: StackingRule
+  Duration: Duration
+  Visuals: VisualManifest
+  Modifiers: EffectModifier[]
+}
+
+[<Struct>]
 type ActiveEffect = {
-  SourceSkillId: int<SkillId>
-  SourceEffectKind: EffectKind
-  RemainingDuration: TimeSpan
-  StackingRule: StackingRule
-  Intensity: int
-  Visual: VisualManifest voption
+  Id: int<EffectId>
+  SourceEffect: Effect
+  SourceEntity: int64<EntityId>
+  TargetEntity: int64<EntityId>
+  StartTime: TimeSpan
+  StackCount: int
 }
 
 [<Struct>]

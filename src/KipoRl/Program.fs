@@ -61,12 +61,16 @@ let update
   match msg with
   | Tick gt -> world, Cmd.none
   | FixedStep dt ->
+    world.Time.Delta <- TimeSpan.FromSeconds(float dt)
+    world.Time.TotalGameTime <- world.Time.TotalGameTime + world.Time.Delta
+
     world
     |> System.start
     |> System.pipeMutable PlayerMovementSystem.update
     |> System.pipeMutable(MovementSystem.update dt)
     |> System.pipeMutable(UnitMovementSystem.update dt)
     |> System.pipeMutable(ResourceManagerSystem.update dt)
+    |> System.pipeMutable(EffectProcessingSystem.update dt)
     |> System.finish id
 
   | Input inputMsg ->
@@ -106,6 +110,9 @@ let update
     | CombatMsg.EffectApplied _ -> world, Cmd.none
     | CombatMsg.EffectDamage _ -> world, Cmd.none
     | CombatMsg.EntityDied _ -> world, Cmd.none
+
+  | EffectProcessing effectMsg ->
+    EffectProcessingSystem.handleMsg world effectMsg
 
   | Notification _ -> world, Cmd.none
 
