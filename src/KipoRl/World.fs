@@ -48,8 +48,22 @@ type MovementState() =
   member val Targets: Dictionary<int64<EntityId>, WorldPosition> =
     Dictionary() with get, set
 
+type CombatState() =
+  member val Resources: Dictionary<int64<EntityId>, Resource> =
+    Dictionary() with get, set
+
+  member val DerivedStats: Dictionary<int64<EntityId>, DerivedStats> =
+    Dictionary() with get, set
+
+  member val InCombatUntil: Dictionary<int64<EntityId>, TimeSpan> =
+    Dictionary() with get, set
+
+  member val RegenAccumulators: Dictionary<int64<EntityId>, struct (float32 * float32)> =
+    Dictionary() with get, set
+
 type World() =
   member val Input: InputState = InputState() with get, set
   member val Entities: EntityState = EntityState() with get, set
   member val Movement: MovementState = MovementState() with get, set
+  member val Combat: CombatState = CombatState() with get, set
   member val Players: HashSet<int64<EntityId>> = HashSet() with get, set

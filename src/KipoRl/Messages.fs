@@ -18,8 +18,13 @@ type MovementMsg =
   | MovementPathChanged of entityId: int64<EntityId> * path: WorldPosition[]
 
 [<Struct>]
+type NotificationMsg =
+  | ResourceRestored of entityId: int64<EntityId> * resource: ResourceKind * amount: int
+
+[<Struct>]
 type TopLevelMsg =
   | Tick of tick: GameTime
   | FixedStep of dt: float32
   | Input of inputMsg: InputMsg
   | Movement of movementMsg: MovementMsg
+  | Notification of notificationMsg: NotificationMsg
