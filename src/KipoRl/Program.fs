@@ -15,16 +15,29 @@ open Mibo.Input
 
 let inputMap =
   InputMap.empty
-  |> InputMap.key MoveForward KeyboardKey.W
-  |> InputMap.key MoveForward KeyboardKey.Up
-  |> InputMap.key MoveBackward KeyboardKey.S
-  |> InputMap.key MoveBackward KeyboardKey.Down
-  |> InputMap.key MoveLeft KeyboardKey.A
-  |> InputMap.key MoveLeft KeyboardKey.Left
-  |> InputMap.key MoveRight KeyboardKey.D
-  |> InputMap.key MoveRight KeyboardKey.Right
-  |> InputMap.key MoveUp KeyboardKey.Space
-  |> InputMap.key MoveDown KeyboardKey.LeftShift
+  // Ability slots
+  |> InputMap.key UseSlot1 KeyboardKey.Q
+  |> InputMap.key UseSlot2 KeyboardKey.E
+  |> InputMap.key UseSlot3 KeyboardKey.R
+  |> InputMap.key UseSlot4 KeyboardKey.F
+  |> InputMap.key UseSlot5 KeyboardKey.Z
+  |> InputMap.key UseSlot6 KeyboardKey.X
+  |> InputMap.key UseSlot7 KeyboardKey.C
+  |> InputMap.key UseSlot8 KeyboardKey.V
+  // Action set switching
+  |> InputMap.key SetActionSet1 KeyboardKey.One
+  |> InputMap.key SetActionSet2 KeyboardKey.Two
+  |> InputMap.key SetActionSet3 KeyboardKey.Three
+  |> InputMap.key SetActionSet4 KeyboardKey.Four
+  |> InputMap.key SetActionSet5 KeyboardKey.Five
+  |> InputMap.key SetActionSet6 KeyboardKey.Six
+  |> InputMap.key SetActionSet7 KeyboardKey.Seven
+  |> InputMap.key SetActionSet8 KeyboardKey.Eight
+  // UI
+  |> InputMap.key Cancel KeyboardKey.Escape
+  |> InputMap.key ToggleInventory KeyboardKey.I
+  |> InputMap.key ToggleAbilities KeyboardKey.K
+  |> InputMap.key ToggleCharacterSheet KeyboardKey.C
 
 // ─────────────────────────────────────────────────────────────
 // Init
@@ -59,6 +72,19 @@ let update
     match inputMsg with
     | ActionStatesChanged(entityId, states) ->
       InputSystem.update entityId states world
+      world, Cmd.none
+    | MouseClick(entityId, screenPos) ->
+      // TODO: Convert screen → world using camera when camera system lands
+      let worldPos = {
+        X = screenPos.X
+        Y = 0.f
+        Z = screenPos.Y
+      }
+
+      MovementSystem.handleMsg
+        world
+        (MovementMsg.MovementTarget(entityId, worldPos))
+
       world, Cmd.none
 
   | Movement movementMsg ->
@@ -122,10 +148,16 @@ let main _ =
     })
     |> Program.withInput
     |> Program.withSubscription(fun ctx _model ->
-      InputMapper.subscribeStatic
-        inputMap
-        (fun states -> Input(ActionStatesChanged(playerId, states)))
-        ctx)
+      let inputSub =
+        InputMapper.subscribeStatic
+          inputMap
+          (fun states -> Input(ActionStatesChanged(playerId, states)))
+          ctx
+
+      let clickSub =
+        Mouse.onLeftClick (fun pos -> Input(MouseClick(playerId, pos))) ctx
+
+      Sub.batch [ inputSub; clickSub ])
     |> Program.withTick Tick
     |> Program.withFixedStep {
       StepSeconds = (1.f / 60.f)

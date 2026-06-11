@@ -2,39 +2,34 @@ module KipoRl.Tests.MovementTests
 
 open Expecto
 open KipoRl
-open Mibo.Input
 open System.Numerics
 open FSharp.UMX
 
 let tests =
   testList "Movement" [
-    test "PlayerMovementSystem sets velocity from input" {
+    test "PlayerMovementSystem sets velocity toward target" {
       let world = World()
       let entityId = UMX.tag 0L
       world.Players.Add entityId |> ignore
       world.Entities.Positions[entityId] <- Vector3.Zero
-
-      world.Input.ActionStates[entityId] <-
-        {
-          ActionState.empty with
-              Held = Set [ MoveRight; MoveForward ]
-        }
+      world.Movement.Targets[entityId] <- { X = 10.f; Y = 0.f; Z = 0.f }
 
       let struct (world, _) = PlayerMovementSystem.update world
 
       let vel = world.Entities.Velocities[entityId]
+      Expect.isGreaterThan (abs vel.X) 0.001f "X velocity should be nonzero"
+      Expect.equal world.Movement.States[entityId] Moving "Should be Moving"
+    }
 
-      Expect.floatClose
-        Accuracy.medium
-        (float vel.X)
-        5.0
-        "X velocity should be moveSpeed"
+    test "PlayerMovementSystem sets Idle when no target" {
+      let world = World()
+      let entityId = UMX.tag 0L
+      world.Players.Add entityId |> ignore
+      world.Entities.Positions[entityId] <- Vector3(5.f, 0.f, 5.f)
 
-      Expect.floatClose
-        Accuracy.medium
-        (float vel.Z)
-        -5.0
-        "Z velocity should be -moveSpeed"
+      let struct (world, _) = PlayerMovementSystem.update world
+
+      Expect.equal world.Movement.States[entityId] Idle "Should be Idle"
     }
 
     test "MovementSystem applies velocity to position" {

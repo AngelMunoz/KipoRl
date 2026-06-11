@@ -1,5 +1,6 @@
 namespace KipoRl
 
+open System.Numerics
 open Mibo.Elmish
 open Mibo.Input
 
@@ -8,6 +9,7 @@ type InputMsg =
   | ActionStatesChanged of
     entityId: int64<EntityId> *
     states: ActionState<GameAction>
+  | MouseClick of entityId: int64<EntityId> * position: Vector2
 
 [<Struct>]
 type MovementMsg =

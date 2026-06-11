@@ -4,7 +4,6 @@ open Expecto
 open KipoRl
 open System.Numerics
 open FSharp.UMX
-open Mibo.Input
 
 let tests =
   testList "UnitMovement E2E" [
@@ -93,18 +92,35 @@ let tests =
       Expect.equal world.Movement.States[entityId] Moving "Should be Moving"
     }
 
-    test "player entities skip UnitMovementSystem in pipeline" {
+    test
+      "player entities are handled by PlayerMovementSystem, not UnitMovementSystem" {
       let world = World()
-      let entityId = UMX.tag 3L
-      world.Players.Add entityId |> ignore
-      world.Entities.Positions[entityId] <- Vector3(0.f, 0.f, 0.f)
-      world.Movement.Targets[entityId] <- { X = 10.f; Y = 0.f; Z = 0.f }
+      let player = UMX.tag 3L
+      let unit = UMX.tag 4L
+      world.Players.Add player |> ignore
+      world.Entities.Positions[player] <- Vector3(0.f, 0.f, 0.f)
+      world.Entities.Positions[unit] <- Vector3(0.f, 0.f, 0.f)
+      world.Movement.Targets[player] <- { X = 10.f; Y = 0.f; Z = 0.f }
+      world.Movement.Targets[unit] <- { X = 10.f; Y = 0.f; Z = 0.f }
 
       let struct (world, _) = Program.update (FixedStep(1.f)) world
 
-      Expect.isFalse
-        (world.Entities.Velocities.ContainsKey entityId)
-        "Player velocity should not be set by UnitMovementSystem"
+      Expect.isGreaterThan
+        (abs world.Entities.Velocities[player].X)
+        0.001f
+        "Player should have velocity from PlayerMovementSystem"
+
+      Expect.equal
+        world.Movement.States[player]
+        Moving
+        "Player should be Moving"
+
+      Expect.isGreaterThan
+        (abs world.Entities.Velocities[unit].X)
+        0.001f
+        "Unit should have velocity from UnitMovementSystem"
+
+      Expect.equal world.Movement.States[unit] Moving "Unit should be Moving"
     }
 
     test "player and non-player move independently in same world" {
@@ -114,20 +130,9 @@ let tests =
       world.Players.Add player |> ignore
       world.Entities.Positions[player] <- Vector3(0.f, 0.f, 0.f)
       world.Entities.Positions[unit] <- Vector3(0.f, 0.f, 0.f)
+      world.Movement.Targets[player] <- { X = 10.f; Y = 0.f; Z = 0.f }
       world.Movement.Targets[unit] <- { X = 10.f; Y = 0.f; Z = 0.f }
 
-      let msg =
-        TopLevelMsg.Input(
-          InputMsg.ActionStatesChanged(
-            player,
-            {
-              ActionState.empty with
-                  Held = Set [ MoveRight ]
-            }
-          )
-        )
-
-      let struct (world, _) = Program.update msg world
       let struct (world, _) = Program.update (FixedStep(1.f)) world
 
       let playerVel = world.Entities.Velocities[player]

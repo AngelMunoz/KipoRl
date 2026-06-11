@@ -12,26 +12,23 @@ let tests =
 
       let states = {
         ActionState.empty with
-            Held = Set [ MoveLeft; MoveForward ]
-            Started = Set [ MoveForward ]
+            Held = Set [ UseSlot1; UseSlot2 ]
+            Started = Set [ UseSlot2 ]
       }
 
       InputSystem.update (UMX.tag 0L) states world
 
       let stored = world.Input.ActionStates[UMX.tag 0L]
-      Expect.isTrue (stored.Held.Contains MoveLeft) "MoveLeft should be held"
+      Expect.isTrue (stored.Held.Contains UseSlot1) "UseSlot1 should be held"
+      Expect.isTrue (stored.Held.Contains UseSlot2) "UseSlot2 should be held"
 
       Expect.isTrue
-        (stored.Held.Contains MoveForward)
-        "MoveForward should be held"
-
-      Expect.isTrue
-        (stored.Started.Contains MoveForward)
-        "MoveForward should be started"
+        (stored.Started.Contains UseSlot2)
+        "UseSlot2 should be started"
 
       Expect.isFalse
-        (stored.Held.Contains MoveRight)
-        "MoveRight should not be held"
+        (stored.Held.Contains UseSlot3)
+        "UseSlot3 should not be held"
     }
 
     test "separate entities have independent input states" {
@@ -39,28 +36,28 @@ let tests =
 
       let playerState = {
         ActionState.empty with
-            Held = Set [ MoveLeft ]
+            Held = Set [ UseSlot1 ]
       }
 
       let enemyState = {
         ActionState.empty with
-            Held = Set [ MoveRight ]
+            Held = Set [ UseSlot3 ]
       }
 
       InputSystem.update (UMX.tag 0L) playerState world
       InputSystem.update (UMX.tag 1L) enemyState world
 
       Expect.isTrue
-        (world.Input.ActionStates[UMX.tag 0L].Held.Contains MoveLeft)
-        "Player should have MoveLeft"
+        (world.Input.ActionStates[UMX.tag 0L].Held.Contains UseSlot1)
+        "Player should have UseSlot1"
 
       Expect.isTrue
-        (world.Input.ActionStates[UMX.tag 1L].Held.Contains MoveRight)
-        "Enemy should have MoveRight"
+        (world.Input.ActionStates[UMX.tag 1L].Held.Contains UseSlot3)
+        "Enemy should have UseSlot3"
 
       Expect.isFalse
-        (world.Input.ActionStates[UMX.tag 0L].Held.Contains MoveRight)
-        "Player should not have MoveRight"
+        (world.Input.ActionStates[UMX.tag 0L].Held.Contains UseSlot3)
+        "Player should not have UseSlot3"
     }
 
     test "updating same entity overwrites previous state" {
@@ -68,12 +65,12 @@ let tests =
 
       let frame1 = {
         ActionState.empty with
-            Held = Set [ MoveLeft ]
+            Held = Set [ UseSlot1 ]
       }
 
       let frame2 = {
         ActionState.empty with
-            Held = Set [ MoveRight ]
+            Held = Set [ UseSlot2 ]
       }
 
       InputSystem.update (UMX.tag 0L) frame1 world
@@ -82,11 +79,11 @@ let tests =
       let stored = world.Input.ActionStates[UMX.tag 0L]
 
       Expect.isFalse
-        (stored.Held.Contains MoveLeft)
-        "MoveLeft should be gone after overwrite"
+        (stored.Held.Contains UseSlot1)
+        "UseSlot1 should be gone after overwrite"
 
       Expect.isTrue
-        (stored.Held.Contains MoveRight)
-        "MoveRight should be present after overwrite"
+        (stored.Held.Contains UseSlot2)
+        "UseSlot2 should be present after overwrite"
     }
   ]

@@ -7,12 +7,28 @@ open Mibo.Input
 
 [<Struct>]
 type GameAction =
-  | MoveForward
-  | MoveBackward
-  | MoveLeft
-  | MoveRight
-  | MoveUp
-  | MoveDown
+  | PrimaryAction
+  | SecondaryAction
+  | UseSlot1
+  | UseSlot2
+  | UseSlot3
+  | UseSlot4
+  | UseSlot5
+  | UseSlot6
+  | UseSlot7
+  | UseSlot8
+  | SetActionSet1
+  | SetActionSet2
+  | SetActionSet3
+  | SetActionSet4
+  | SetActionSet5
+  | SetActionSet6
+  | SetActionSet7
+  | SetActionSet8
+  | Cancel
+  | ToggleInventory
+  | ToggleAbilities
+  | ToggleCharacterSheet
 
 type InputState() =
   member val ActionStates: Dictionary<int64<EntityId>, ActionState<GameAction>> =
