@@ -20,6 +20,10 @@ type MovementMsg =
 
 [<Struct>]
 type NotificationMsg =
+  | ShowMessage of
+    entityId: int64<EntityId> *
+    text: string *
+    typ: NotificationType
   | ResourceRestored of
     entityId: int64<EntityId> *
     resource: ResourceKind *
@@ -36,6 +40,7 @@ type ResourceManagerMsg =
 type EffectProcessingMsg =
   | ApplyEffect of target: int64<EntityId> * effect: ActiveEffect
   | RemoveEffect of target: int64<EntityId> * effectIndex: int
+  | EffectExpired of target: int64<EntityId> * effectId: int<EffectId>
 
 [<Struct>]
 type CombatMsg =

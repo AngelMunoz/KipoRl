@@ -16,6 +16,8 @@
     <Compile Include="ResourceManagerTests.fs" />
     <Compile Include="ResourceManagerE2ETests.fs" />
     <Compile Include="EffectProcessingE2ETests.fs" />
+    <Compile Include="NotificationE2ETests.fs" />
+    <Compile Include="PlayerMovementE2ETests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

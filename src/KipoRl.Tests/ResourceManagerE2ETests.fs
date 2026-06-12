@@ -278,7 +278,7 @@ let tests =
         "MP should cap at max"
     }
 
-    test "RestoreResource emits correct NotificationMsg" {
+    test "RestoreResource emits ShowMessage notification" {
       let entityId = UMX.tag 0L
       let world = makeWorld entityId 50 50 100 100 0 0
 
@@ -295,14 +295,14 @@ let tests =
 
         effect.Invoke(fun actual ->
           match actual with
-          | Notification(ResourceRestored(entity, resource, amount)) ->
+          | Notification(ShowMessage(entity, text, typ)) ->
             Expect.equal entity entityId "Should target correct entity"
-            Expect.equal resource HP "Should restore HP"
-            Expect.equal amount 30 "Should restore 30"
+            Expect.equal text "+30 HP" "Should format restore text"
+            Expect.equal typ Heal "Should be Heal type"
             found <- true
           | other -> failwithf "Unexpected msg: %A" other)
 
-        Expect.isTrue found "Should have emitted ResourceRestored notification"
+        Expect.isTrue found "Should have emitted ShowMessage notification"
       | other -> failwithf "Expected Cmd.Single, got %A" other
     }
 

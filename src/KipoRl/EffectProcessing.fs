@@ -45,13 +45,50 @@ module EffectProcessingSystem =
     : struct (World * Cmd<TopLevelMsg>) =
     match msg with
     | ApplyEffect(target, effect) ->
-      let effects =
+      let existingEffects =
         world.Combat.ActiveEffects
         |> Dictionary.tryFindV target
         |> ValueOption.defaultValue(ResizeArray())
 
-      effects.Add effect
-      world.Combat.ActiveEffects[target] <- effects
+      let inline findExisting() =
+        existingEffects
+        |> ResizeArray.tryFindV(fun ae ->
+          ae.SourceEffect.Name = effect.SourceEffect.Name)
+
+      match effect.SourceEffect.Stacking with
+      | NoStack ->
+        match findExisting() with
+        | ValueSome _ -> ()
+        | ValueNone ->
+          existingEffects.Add effect
+          world.Combat.ActiveEffects[target] <- existingEffects
+
+      | RefreshDuration ->
+        match findExisting() with
+        | ValueSome existing ->
+          let idx = existingEffects.IndexOf existing
+
+          existingEffects[idx] <- {
+            existing with
+                StartTime = world.Time.TotalGameTime
+          }
+        | ValueNone ->
+          existingEffects.Add effect
+          world.Combat.ActiveEffects[target] <- existingEffects
+
+      | AddStack maxStacks ->
+        match findExisting() with
+        | ValueSome existing when existing.StackCount < maxStacks ->
+          let idx = existingEffects.IndexOf existing
+
+          existingEffects[idx] <- {
+            existing with
+                StackCount = existing.StackCount + 1
+          }
+        | ValueSome _ -> ()
+        | ValueNone ->
+          existingEffects.Add effect
+          world.Combat.ActiveEffects[target] <- existingEffects
 
       world, Cmd.none
 
@@ -63,6 +100,8 @@ module EffectProcessingSystem =
           effects.RemoveAt effectIndex)
 
       world, Cmd.none
+
+    | EffectExpired _ -> world, Cmd.none
 
   let inline private intervalCrossed dt interval elapsed =
     let deltaTime = TimeSpan.FromSeconds(float dt)
@@ -88,10 +127,18 @@ module EffectProcessingSystem =
 
         | Timed duration ->
           if elapsed >= duration then
+            messages.Add(
+              Cmd.ofMsg(EffectProcessing(EffectExpired(entityId, effect.Id)))
+            )
+
             effects.RemoveAt i
 
         | Loop(interval, duration) ->
           if elapsed >= duration then
+            messages.Add(
+              Cmd.ofMsg(EffectProcessing(EffectExpired(entityId, effect.Id)))
+            )
+
             effects.RemoveAt i
           else if intervalCrossed dt interval elapsed then
             processInterval entityId effect (Cmd.ofMsg >> messages.Add)

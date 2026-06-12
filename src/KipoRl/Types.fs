@@ -360,3 +360,10 @@ type VisualEffect = {
   RemainingLife: TimeSpan
   Visual: VisualManifest
 }
+
+[<Struct>]
+type WorldNotification = {
+  EntityId: int64<EntityId>
+  Text: string
+  Typ: NotificationType
+}

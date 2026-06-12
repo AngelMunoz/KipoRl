@@ -68,6 +68,11 @@ type CombatState() =
     ResizeArray<ActiveEffect>
    > = Dictionary() with get, set
 
+  member val CombatStatuses: Dictionary<
+    int64<EntityId>,
+    ResizeArray<CombatStatus>
+   > = Dictionary() with get, set
+
 type TimeState() =
   member val TotalGameTime: TimeSpan = TimeSpan.Zero with get, set
   member val Delta: TimeSpan = TimeSpan.Zero with get, set
@@ -79,3 +84,6 @@ type World() =
   member val Movement: MovementState = MovementState() with get, set
   member val Combat: CombatState = CombatState() with get, set
   member val Players: HashSet<int64<EntityId>> = HashSet() with get, set
+
+  member val Notifications: ResizeArray<WorldNotification> =
+    ResizeArray() with get, set

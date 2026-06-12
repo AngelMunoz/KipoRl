@@ -53,7 +53,12 @@ module ResourceManagerSystem =
         if newRes.HP <> current.HP || newRes.MP <> current.MP then
           world.Combat.Resources[target] <- newRes)
 
-      world, Cmd.ofMsg(Notification(ResourceRestored(target, resource, amount)))
+      let text =
+        match resource with
+        | HP -> $"+%d{amount} HP"
+        | MP -> $"+%d{amount} MP"
+
+      struct (world, Cmd.ofMsg(Notification(ShowMessage(target, text, Heal))))
 
   let update (dt: float32) (world: World) : struct (World * Cmd<TopLevelMsg>) =
     let totalGameTime = world.Time.TotalGameTime

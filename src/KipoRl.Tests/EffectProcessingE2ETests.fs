@@ -129,6 +129,24 @@ let tests =
         "Effect should expire"
     }
 
+    test "timed effect emits EffectExpired on expiry" {
+      let entityId = UMX.tag 0L
+      let world = makeWorld entityId
+      let effect = makeEffect Stun (Timed(TimeSpan.FromSeconds(1.0))) 0
+      let world = applyEffect world entityId effect
+
+      let struct (_, msgs) = tickNCollect world 66
+
+      let hasExpired =
+        msgs
+        |> Seq.exists(fun m ->
+          match m with
+          | EffectProcessing(EffectExpired _) -> true
+          | _ -> false)
+
+      Expect.isTrue hasExpired "Should emit EffectExpired"
+    }
+
     test "timed effect persists before duration" {
       let entityId = UMX.tag 0L
       let world = makeWorld entityId
@@ -242,7 +260,15 @@ let tests =
 
       let struct (_, msgs) = tickNCollect world 210
 
-      Expect.equal msgs.Count 2 "Should emit exactly 2 ticks then stop"
+      let restores =
+        msgs
+        |> ResizeArray.chooseV(fun m ->
+          match m with
+          | ResourceManager(RestoreResource(target, resource, amount)) ->
+            ValueSome(target, resource, amount)
+          | _ -> ValueNone)
+
+      Expect.equal restores.Count 2 "Should emit exactly 2 ticks then stop"
     }
 
     // ── PermanentLoop emission ──
@@ -336,7 +362,15 @@ let tests =
       let entityId = UMX.tag 0L
       let world = makeWorld entityId
       let effect1 = makeEffect Stun (Timed(TimeSpan.FromSeconds(2.0))) 0
-      let effect2 = makeEffect Silence (Timed(TimeSpan.FromSeconds(5.0))) 0
+      let base2 = makeEffect Silence (Timed(TimeSpan.FromSeconds(5.0))) 0
+
+      let effect2 = {
+        base2 with
+            SourceEffect = {
+              base2.SourceEffect with
+                  Name = "silence"
+            }
+      }
 
       let world = applyEffect world entityId effect1
       let world = applyEffect world entityId effect2
@@ -362,5 +396,80 @@ let tests =
 
       let struct (_, _) = Program.update (FixedStep(1.f / 60.f)) world
       ()
+    }
+
+    // ── Stacking rules ──
+
+    test "NoStack prevents duplicate effects" {
+      let entityId = UMX.tag 0L
+      let world = makeWorld entityId
+      let effect = makeEffect Stun (Timed(TimeSpan.FromSeconds(5.0))) 0
+
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+
+      Expect.equal
+        (world.Combat.ActiveEffects[entityId].Count)
+        1
+        "Should not stack"
+    }
+
+    test "RefreshDuration resets timer on duplicate" {
+      let entityId = UMX.tag 0L
+      let world = makeWorld entityId
+      let baseEffect = makeEffect Stun (Timed(TimeSpan.FromSeconds(5.0))) 0
+
+      let effect = {
+        baseEffect with
+            SourceEffect = {
+              baseEffect.SourceEffect with
+                  Stacking = RefreshDuration
+            }
+      }
+
+      let world = applyEffect world entityId effect
+      let w = tickN world 60
+
+      let world2 = applyEffect w entityId effect
+
+      let remaining =
+        world2.Combat.ActiveEffects[entityId].[0].SourceEffect.Duration
+
+      match remaining with
+      | Timed d ->
+        Expect.equal d (TimeSpan.FromSeconds 5.0) "Timer should reset"
+      | _ -> failtest "Expected Timed duration"
+    }
+
+    test "AddStack increments stack count up to max" {
+      let entityId = UMX.tag 0L
+      let world = makeWorld entityId
+      let baseEffect = makeEffect Debuff (Timed(TimeSpan.FromSeconds(5.0))) 0
+
+      let effect = {
+        baseEffect with
+            SourceEffect = {
+              baseEffect.SourceEffect with
+                  Stacking = AddStack 3
+            }
+      }
+
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+      let world = applyEffect world entityId effect
+
+      Expect.equal
+        (world.Combat.ActiveEffects[entityId].Count)
+        1
+        "Should have 1 effect"
+
+      Expect.equal
+        (world.Combat.ActiveEffects[entityId].[0].StackCount)
+        3
+        "Should be at max stacks"
     }
   ]

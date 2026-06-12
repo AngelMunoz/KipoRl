@@ -71,6 +71,7 @@ let update
     |> System.pipeMutable(UnitMovementSystem.update dt)
     |> System.pipeMutable(ResourceManagerSystem.update dt)
     |> System.pipeMutable(EffectProcessingSystem.update dt)
+    |> System.pipeMutable NotificationSystem.update
     |> System.finish id
 
   | Input inputMsg ->
@@ -114,7 +115,8 @@ let update
   | EffectProcessing effectMsg ->
     EffectProcessingSystem.handleMsg world effectMsg
 
-  | Notification _ -> world, Cmd.none
+  | Notification notificationMsg ->
+    NotificationSystem.handleMsg world notificationMsg
 
 // ─────────────────────────────────────────────────────────────
 // View
